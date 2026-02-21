@@ -56,7 +56,7 @@ function BoardsListPage() {
 
       <div className="grid grid-cols-3 gap-4">
         {boardsQuery.data?.map((board) => (
-          <Card>
+          <Card key={board.id}>
             <CardHeader>
               <Button asChild variant="link">
                 <Link to={href(ROUTES.BOARD, { boardId: board.id })}>
