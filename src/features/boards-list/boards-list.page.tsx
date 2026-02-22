@@ -10,6 +10,10 @@ function BoardsListPage() {
   const queryClient = useQueryClient();
   const boardsQuery = rqClient.useQuery("get", "/boards");
 
+  const { data } = rqClient.useQuery("post", "/auth/refresh");
+
+  console.log(data);
+
   const createBoardMutation = rqClient.useMutation("post", "/boards", {
     onSettled: async () => {
       await queryClient.invalidateQueries(
@@ -52,7 +56,7 @@ function BoardsListPage() {
 
       <div className="grid grid-cols-3 gap-4">
         {boardsQuery.data?.map((board) => (
-          <Card>
+          <Card key={board.id}>
             <CardHeader>
               <Button asChild variant="link">
                 <Link to={href(ROUTES.BOARD, { boardId: board.id })}>
