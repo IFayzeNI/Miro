@@ -1,34 +1,34 @@
 import { useBoardsList } from "./model/use-boards-list";
-import { useUpdateFavorite } from "./model/use-update-favorite";
 import {
+  BoardsLayoutContentGroups,
   BoardsListLayout,
+  BoardsListLayoutCards,
   BoardsListLayoutContent,
   BoardsListLayoutHeader,
+  BoardsListLayoutList,
 } from "./ui/boards-list-layout";
 import { ViewModeToggle, type ViewMode } from "./ui/view-mode-toggle";
 import { useState } from "react";
+import { useRecentGroups } from "./model/use-recent-groups";
 import { BoardItem } from "./compose/board-item";
 import { BoardCard } from "./compose/board-card";
 import { BoardsSidebar } from "./ui/boards-sidebar";
 
 function BoardsListPage() {
   const boardsQuery = useBoardsList({
-    isFavorite: true,
+    sort: "lastOpenedAt",
   });
-  const updateFavorite = useUpdateFavorite();
   const [viewMode, setViewMode] = useState<ViewMode>("list");
 
-  const boards = boardsQuery.boards.filter((board) =>
-    updateFavorite.isOptimisticFavorite(board),
-  );
+  const recentGroups = useRecentGroups(boardsQuery.boards);
 
   return (
     <BoardsListLayout
       sidebar={<BoardsSidebar />}
       header={
         <BoardsListLayoutHeader
-          title="Избранные доски"
-          description="Здесь вы можете просматривать и управлять своими избранными досками"
+          title="Последние доски"
+          description="Здесь вы можете просматривать и управлять своими последними досками"
           actions={
             <ViewModeToggle
               value={viewMode}
@@ -45,13 +45,29 @@ function BoardsListPage() {
           cursorRef={boardsQuery.cursorRef}
           hasCursor={boardsQuery.hasNextPage}
           mode={viewMode}
-          renderGrid={() =>
-            boards.map((board) => <BoardCard key={board.id} board={board} />)
-          }
-          renderList={() =>
-            boards.map((board) => <BoardItem key={board.id} board={board} />)
-          }
-        />
+        >
+          <BoardsLayoutContentGroups
+            groups={recentGroups.map((group) => ({
+              items: {
+                list: (
+                  <BoardsListLayoutList>
+                    {group.items.map((board) => (
+                      <BoardItem key={board.id} board={board} />
+                    ))}
+                  </BoardsListLayoutList>
+                ),
+                cards: (
+                  <BoardsListLayoutCards>
+                    {group.items.map((board) => (
+                      <BoardCard key={board.id} board={board} />
+                    ))}
+                  </BoardsListLayoutCards>
+                ),
+              }[viewMode],
+              title: group.title,
+            }))}
+          />
+        </BoardsListLayoutContent>
       }
     />
   );
