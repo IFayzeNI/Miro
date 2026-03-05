@@ -16,7 +16,7 @@ export function BoardsListCard({
   bottomActions?: React.ReactNode;
 }) {
   return (
-    <Card key={board.id} className="relative">
+    <Card className="relative">
       {rightTopActions && (
         <div className="absolute top-2 right-2 flex items-center gap-2">
           {rightTopActions}
