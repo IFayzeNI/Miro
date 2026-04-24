@@ -56,10 +56,30 @@ export function useNodes() {
     setNodes((lastNodes) => lastNodes.filter((node) => !ids.includes(node.id)));
   };
 
+  const updateNodesPositions = (
+    positions: {
+      id: string;
+      x: number;
+      y: number;
+    }[],
+  ) => {
+    const record = Object.fromEntries(positions.map((p) => [p.id, p]));
+
+    setNodes((lastNodes) =>
+      lastNodes.map((node) => {
+        const newPositions = record[node.id];
+        if (newPositions)
+          return { ...node, x: newPositions.x, y: newPositions.y };
+        return node;
+      }),
+    );
+  };
+
   return {
     nodes,
     addSticker,
     updateStickerText,
+    updateNodesPositions,
     deleteNodes,
   };
 }
