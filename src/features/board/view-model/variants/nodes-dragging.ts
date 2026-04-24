@@ -15,12 +15,12 @@ export function useNodesDraggingViewModel({
   nodesModel,
   setViewState,
   canvasRect,
+  windowPositionModel,
 }: ViewModelParams) {
   const getNodes = (state: NodesDraggingViewState) =>
     nodesModel.nodes.map((node) => {
       if (state.nodesToMove.has(node.id)) {
         const diff = vectorFromPoints(state.startPoint, state.endPoint);
-        console.log("node moved", node, diff);
         return {
           ...node,
           x: node.x + diff.x,
@@ -28,7 +28,6 @@ export function useNodesDraggingViewModel({
           isSelected: true,
         };
       }
-      console.log("miss");
 
       return node;
     });
@@ -41,6 +40,7 @@ export function useNodesDraggingViewModel({
         onMouseMove: (e) => {
           const currentPoint = pointOnScreenToCanvas(
             { x: e.clientX, y: e.clientY },
+            windowPositionModel.position,
             canvasRect,
           );
           setViewState({
