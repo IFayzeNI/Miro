@@ -14,9 +14,12 @@ import { useWindowEvents } from "./hooks/use-window-event";
 import { useNodes } from "./model/nodes";
 import { useViewModel } from "./view-model/use-view-model";
 import { useNodesDimensions } from "./hooks/use-nodes-dimensions";
+import { useWindowPositionModel } from "./model/window-position";
 
 function BoardPage() {
   const nodesModel = useNodes();
+  const windowPositionModel = useWindowPositionModel();
+
   const focusLayoutRef = useLayoutFocus();
   const { canvasRef, canvasRect } = useCanvasRect();
   const { nodeRef, nodesDimensions } = useNodesDimensions();
@@ -25,6 +28,7 @@ function BoardPage() {
     nodesModel,
     canvasRect,
     nodesDimensions,
+    windowPositionModel,
   });
 
   useWindowEvents(viewModel);
@@ -33,19 +37,28 @@ function BoardPage() {
     <Layout ref={focusLayoutRef} onKeyDown={viewModel.layout?.onKeyDown}>
       <Dots />
 
-      <Canvas ref={canvasRef} onClick={viewModel.canvas?.onClick}>
-        <Overlay
-          onClick={viewModel.overlay?.onClick}
-          onMouseDown={viewModel.overlay?.onMouseDown}
-          onMouseUp={viewModel.overlay?.onMouseUp}
-        />
+      <Canvas
+        ref={canvasRef}
+        onClick={viewModel.canvas?.onClick}
+        windowPosition={
+          viewModel.windowPosition ?? windowPositionModel.position
+        }
+        overlay={
+          <Overlay
+            onClick={viewModel.overlay?.onClick}
+            onMouseDown={viewModel.overlay?.onMouseDown}
+            onMouseUp={viewModel.overlay?.onMouseUp}
+          />
+        }
+      >
         {viewModel.nodes.map((node) => (
           <Sticker key={node.id} {...node} ref={nodeRef} />
         ))}
+        {viewModel.selectionWindow && (
+          <SelectionWindow {...viewModel.selectionWindow} />
+        )}
       </Canvas>
-      {viewModel.selectionWindow && (
-        <SelectionWindow {...viewModel.selectionWindow} />
-      )}
+
       <Actions>
         <ActionButton
           isActive={viewModel.actions?.addSticker?.isActive}

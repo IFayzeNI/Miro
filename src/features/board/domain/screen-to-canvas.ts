@@ -1,9 +1,14 @@
-import type { CanvasRect } from "../hooks/use-canvas-rect";
+import type { WindowPosition } from "../model/window-position";
+import type { Point } from "./point";
 
 export function pointOnScreenToCanvas(
-  point: { x: number; y: number },
-  canvasRect?: CanvasRect,
+  point: Point,
+  windowPosition: WindowPosition,
+  canvasRect?: Point,
 ) {
   if (!canvasRect) return point;
-  return { x: point.x - canvasRect.x, y: point.y - canvasRect.y };
+  return {
+    x: point.x - canvasRect.x - windowPosition.x,
+    y: point.y - canvasRect.y - windowPosition.y,
+  };
 }
